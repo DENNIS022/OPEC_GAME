@@ -5,22 +5,18 @@ from scipy.optimize import minimize
 
 file_path = 'OPEC_CODE/high_demand_even.xlsx'
 
-try:
-    high_demand = pd.read_csv(file_path)
-except ValueError as e:
-    xl = pd.ExcelFile(file_path)
-    first_sheet_name = xl.sheet_names[0]
-    high_demand = pd.read_excel(file_path, sheet_name=first_sheet_name)
+
+xl = pd.ExcelFile(file_path)
+first_sheet_name = xl.sheet_names[0]
+high_demand = pd.read_excel(file_path, sheet_name=first_sheet_name)
 high_demand['OPEC Demand(thousand bbl/day)'] = high_demand['Estimated World Demand(thousand bbl/day)'] - high_demand['Estimated ROW Demand(thousand bbl/day)']
 
 file_path = 'OPEC_CODE/low_demand_odd.xlsx'
 
-try:
-    low_demand = pd.read_csv(file_path)
-except ValueError as e:
-    xl = pd.ExcelFile(file_path)
-    first_sheet_name = xl.sheet_names[0]
-    low_demand = pd.read_excel(file_path, sheet_name=first_sheet_name)
+
+xl = pd.ExcelFile(file_path)
+first_sheet_name = xl.sheet_names[0]
+low_demand = pd.read_excel(file_path, sheet_name=first_sheet_name)
 low_demand['OPEC Demand(thousand bbl/day)'] = low_demand['Estimated World Demand(thousand bbl/day)'] - low_demand['Estimated ROW Demand(thousand bbl/day)']
 
 x1 = low_demand['OPEC Demand(thousand bbl/day)']
@@ -33,12 +29,10 @@ slope_low, intercept_low = np.polyfit(x1, y1, 1)
 slope_high, intercept_high = np.polyfit(x2, y2, 1)
 
 file_path = 'OPEC_CODE/country_data.xlsx'
-try:
-    country_data = pd.read_csv(file_path)
-except ValueError as e:
-    xl = pd.ExcelFile(file_path)
-    first_sheet_name = xl.sheet_names[0]
-    country_data = pd.read_excel(file_path, sheet_name=first_sheet_name)
+
+xl = pd.ExcelFile(file_path)
+first_sheet_name = xl.sheet_names[0]
+country_data = pd.read_excel(file_path, sheet_name=first_sheet_name)
 
 interest_rate = 0.05
 backstop_price = 70 # $/bbl
