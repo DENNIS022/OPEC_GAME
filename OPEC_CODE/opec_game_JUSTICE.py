@@ -131,8 +131,8 @@ def main():
                 i = countries.index(country)
                 mc = marginal_costs[country]
                 profit = (price - mc) * Q_t[i]
-                present_value = profit / ((1 + interest_rate) ** t)
-                total_profit += present_value
+                future_value = profit  * (1 + interest_rate) ** (n - t)
+                total_profit += future_value
         return -total_profit  # 最大化利潤
 
     # 初始猜測和邊界
@@ -180,17 +180,17 @@ def main():
         for i, country in enumerate(countries):
             mc = marginal_costs[country]
             profit = (price - mc) * Q_t[i]
-            present_value = profit / ((1 + interest_rate) ** t)
+            future_value = profit  * (1 + interest_rate) ** (n - t)
             if country not in country_profits:
                 country_profits[country] = 0
-            country_profits[country] += present_value
+            country_profits[country] += future_value
 
     # 計算 OPEC 總利潤
     total_opec_reserve = country_data.loc[1, 'OPEC']
     total_opec_production = np.sum(Q)
     opec_leftover = total_opec_reserve - total_opec_production
     average_mc = np.mean([marginal_costs[country] for country in countries])
-    opec_leftover_profit = (backstop_price - average_mc) * opec_leftover / ((1 + interest_rate) ** n)
+    opec_leftover_profit = (backstop_price - average_mc) * opec_leftover
     total_profit = sum(country_profits.values())
     opec_actual_profit = total_profit + opec_leftover_profit
 
@@ -203,7 +203,7 @@ def main():
         profit = country_profits[country]
         total_production = np.sum(Q[i, :])
         leftover = total_reserve - total_production
-        leftover_profit = (backstop_price - mc) * leftover / ((1 + interest_rate) ** n)
+        leftover_profit = (backstop_price - mc) * leftover
         actual_profit = profit + leftover_profit
         production_details = ', '.join(
             [f"Period {t+1}: {Q[i, t]:.2f}" for t in range(n)]
