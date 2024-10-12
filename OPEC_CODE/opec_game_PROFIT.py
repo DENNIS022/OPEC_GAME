@@ -92,7 +92,8 @@ def main():
 
         for t in range(n):
             with cols[t]:
-                val = st.slider(
+                # 用 number_input 代替 slider，允許用戶直接輸入值
+                val = st.number_input(
                     f"{country} - P{t+1}",
                     min_value=0.0,
                     max_value=float(capacity),
@@ -108,7 +109,6 @@ def main():
                     value=False,
                     key=manual_key
                 )
-
             idx = i * n + t  #展開後的首引
 
             if is_manual:
