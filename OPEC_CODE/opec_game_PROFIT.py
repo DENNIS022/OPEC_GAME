@@ -1,12 +1,7 @@
 import pandas as pd
-import scipy.stats as stats
 import numpy as np
-import matplotlib.pyplot as plt
 from scipy.optimize import minimize
-from functools import partial
-import tkinter as tk
-from tkinter import ttk
-import streamlit as st
+
 
 file_path = 'high_demand_even.xlsx'
 
