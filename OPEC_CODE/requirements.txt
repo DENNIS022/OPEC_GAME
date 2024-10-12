@@ -1,5 +1,7 @@
-pandas==2.2.3
-numpy>=2.1.2
-scipy==1.10.1
-matplotlib>=3.5
+matplotlib @ file:///C:/b/abs_085jhivdha/croot/matplotlib-suite_1693812524572/work
+matplotlib-inline @ file:///C:/ci/matplotlib-inline_1661934035815/work
+matplotlib-scalebar==0.8.1
+numpy @ file:///C:/b/abs_54abayvc9j/croot/numpy_and_numpy_base_1682520598361/work
+numpydoc @ file:///C:/b/abs_cfdd4zxbga/croot/numpydoc_1668085912100/work
+scipy==1.9.3
 streamlit==1.39.0
