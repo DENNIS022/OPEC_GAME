@@ -3,5 +3,4 @@ wheel
 matplotlib==3.7.2
 numpy==1.24.3
 scipy==1.9.3
-streamlit==1.39.0
 pandas==1.5.3
