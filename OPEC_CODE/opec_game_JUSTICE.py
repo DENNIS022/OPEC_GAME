@@ -1,7 +1,7 @@
 import pandas as pd
 import numpy as np
 from scipy.optimize import minimize
-
+import streamlit as st
 
 file_path = 'OPEC_CODE/high_demand_even.xlsx'
 
