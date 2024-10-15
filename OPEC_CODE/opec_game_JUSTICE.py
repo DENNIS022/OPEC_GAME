@@ -135,7 +135,7 @@ def main():
                 future_value = profit  * (1 + interest_rate) ** (n - t)
                 backstop_value = (backstop_price - mc) * (capacity - Q_t[i])
                 future_total_value = future_value + backstop_value
-            country_profits[country] += future_total_value
+                country_profits[country] += future_total_value
         return -total_profit  # 最大化利潤
 
     # 初始猜測和邊界
