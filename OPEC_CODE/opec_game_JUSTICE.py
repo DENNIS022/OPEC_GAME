@@ -132,7 +132,9 @@ def main():
                 mc = marginal_costs[country]
                 profit = (price - mc) * Q_t[i]
                 future_value = profit  * (1 + interest_rate) ** (n - t)
-                total_profit += future_value
+                backstop_value = (backstop_price - mc) * (capacities - Q_t[i])
+                future_total_value = future_value + backstop_value
+            country_profits[country] += future_total_value
         return -total_profit  # 最大化利潤
 
     # 初始猜測和邊界
@@ -181,18 +183,20 @@ def main():
             mc = marginal_costs[country]
             profit = (price - mc) * Q_t[i]
             future_value = profit  * (1 + interest_rate) ** (n - t)
+            backstop_value = (backstop_price - mc) * (capacities - Q_t[i])
             if country not in country_profits:
                 country_profits[country] = 0
-            country_profits[country] += future_value
+            future_total_value = future_value + backstop_value
+            country_profits[country] += future_total_value
+            
+            
 
     # 計算 OPEC 總利潤
     total_opec_reserve = country_data.loc[1, 'OPEC']
     total_opec_production = np.sum(Q)
     opec_leftover = total_opec_reserve - total_opec_production
-    average_mc = np.mean([marginal_costs[country] for country in countries])
-    opec_leftover_profit = (backstop_price - average_mc) * opec_leftover
     total_profit = sum(country_profits.values())
-    opec_actual_profit = total_profit + opec_leftover_profit
+    opec_actual_profit = total_profit
 
     # 顯示結果
     st.header("結果顯示")
@@ -203,8 +207,6 @@ def main():
         profit = country_profits[country]
         total_production = np.sum(Q[i, :])
         leftover = total_reserve - total_production
-        leftover_profit = (backstop_price - mc) * leftover
-        actual_profit = profit + leftover_profit
         production_details = ', '.join(
             [f"Period {t+1}: {Q[i, t]:.2f}" for t in range(n)]
         )
@@ -212,13 +214,13 @@ def main():
         st.write(f"總產量(不包含第11期以70元出售): {total_production:.2f}")
         st.write(f"剩餘產量(第11期以70元出售): {leftover:.2f}")
         st.write(f"各期產量: {production_details}")
-        st.write(f"總利潤(於第11期): {profit:.2f} + {leftover_profit:.2f} = {actual_profit:.2f}")
+        st.write(f"總利潤(於第11期): {profit:.2f} ")
 
     # 顯示 OPEC 結果
     st.subheader("OPEC 結果")
     st.write(f"OPEC 總產量: {total_opec_production:.2f}")
     st.write(f"OPEC 剩餘產量(第11期以70元出售): {opec_leftover:.2f}")
-    st.write(f"OPEC 總利潤: {total_profit:.2f} + {opec_leftover_profit:.2f} = {opec_actual_profit:.2f}")
+    st.write(f"OPEC 總利潤: {total_profit:.2f}")
     st.write(f"各期總產量: {', '.join([f'Period {t+1}: {np.sum(Q[:, t]):.2f}' for t in range(n)])}")
 
     # 顯示價格資訊
