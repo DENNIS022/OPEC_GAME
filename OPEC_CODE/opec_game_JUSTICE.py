@@ -130,9 +130,10 @@ def main():
             for country in objective_countries:
                 i = countries.index(country)
                 mc = marginal_costs[country]
+                capacity = capacities[country]
                 profit = (price - mc) * Q_t[i]
                 future_value = profit  * (1 + interest_rate) ** (n - t)
-                backstop_value = (backstop_price - mc) * (capacities - Q_t[i])
+                backstop_value = (backstop_price - mc) * (capacity - Q_t[i])
                 future_total_value = future_value + backstop_value
             country_profits[country] += future_total_value
         return -total_profit  # 最大化利潤
@@ -181,9 +182,10 @@ def main():
 
         for i, country in enumerate(countries):
             mc = marginal_costs[country]
+            capacity = capacities[country]
             profit = (price - mc) * Q_t[i]
             future_value = profit  * (1 + interest_rate) ** (n - t)
-            backstop_value = (backstop_price - mc) * (capacities - Q_t[i])
+            backstop_value = (backstop_price - mc) * (capacity - Q_t[i])
             if country not in country_profits:
                 country_profits[country] = 0
             future_total_value = future_value + backstop_value
