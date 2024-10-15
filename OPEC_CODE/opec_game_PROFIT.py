@@ -156,19 +156,19 @@ def main():
                         key=manual_key
                     )
 
-            idx = i * n + t  # 展開後的索引
+                idx = i * n + t  # 展開後的索引
 
-            if is_manual:
-                # 手動調整為固定變數
-                value = expected_productions[i, t]
-                fixed_indices.append(idx)
-                fixed_values.append(value)
-            else:
-                # 自由變數
-                initial_guess[i, t] = expected_productions[i, t]  
-                free_indices.append(idx)
-                free_initial_guess.append(initial_guess[i, t])
-                free_bounds.append((0, capacity))
+                if is_manual:
+                    # 手動調整為固定變數
+                    value = expected_productions[i, t]
+                    fixed_indices.append(idx)
+                    fixed_values.append(value)
+                else:
+                    # 自由變數
+                    initial_guess[i, t] = expected_productions[i, t]  
+                    free_indices.append(idx)
+                    free_initial_guess.append(initial_guess[i, t])
+                    free_bounds.append((0, capacity))
 
 
     # 將固定值轉換為字典，以便在目標函數中使用
