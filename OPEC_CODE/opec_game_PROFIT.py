@@ -79,7 +79,47 @@ def main():
 
     # 儲存每個國家期望的產量
     expected_productions = np.zeros((n_countries, n))
+    # 讓用戶輸入每期的總生產量和販售金額
+    st.markdown("### 每期 OPEC 總生產量及販售金額")
+    total_world_productions = []
+    total_opec_productions = []
+    total_sales = []
+    for t in range(n):
+        st.markdown(f"#### 第 {t+1} 期")
 
+        total_production = st.number_input(
+            f"第 {t+1} 期全球總生產量（千桶）",
+            min_value=0.00,
+            value=74961.64,  # 預設值，可根據需要調整
+            step=0.01,
+            key=f"total_production_{t}"
+        )
+        sales_value = st.number_input(
+            f"第 {t+1} 期販售金額（USD）",
+            min_value=0.00,
+            value=79.08,  # 預設值，可根據需要調整
+            step=0.01,
+            key=f"total_sales_{t}"
+        )
+        if (t + 1) % 2 == 1:
+            slope = slope_low
+            intercept = intercept_low
+        else:
+            slope = slope_high
+            intercept = intercept_high
+        opec_productions = (sales_value - intercept)/slope
+        
+        # 將每期的總生產量和販售金額加入列表
+        total_opec_productions.append(opec_productions)
+        total_world_productions.append(total_production)
+        total_sales.append(sales_value)
+
+    # 顯示用戶輸入的每期總生產量及總販售金額
+    st.markdown("### 總生產量及販售金額回顯")
+    for t in range(n):
+        st.write(f"第 {t+1} 期總生產量: {total_world_productions[t]} 千桶")
+        st.write(f"第 {t+1} 期OPEC總生產量: {total_opec_productions[t]} 千桶")
+        st.write(f"第 {t+1} 期販售金額: ${total_sales[t]}/桶")
     st.subheader("產量調整")
 
     for i, country in enumerate(countries):
@@ -87,7 +127,6 @@ def main():
 
         capacity = country_data.loc[2, country]
 
-        # 创建滑杆的列列表
         cols = st.columns(n)
 
         for t in range(n):
@@ -109,19 +148,21 @@ def main():
                     value=False,
                     key=manual_key
                 )
-            idx = i * n + t  #展開後的首引
 
-            if is_manual:
-                # 手動調整為固定變數
-                value = expected_productions[i, t]
-                fixed_indices.append(idx)
-                fixed_values.append(value)
-            else:
-                # 自由變數
-                initial_guess[i, t] = expected_productions[i, t]  # 使用滑杆的值作为初始值
-                free_indices.append(idx)
-                free_initial_guess.append(initial_guess[i, t])
-                free_bounds.append((0, capacity))
+        idx = i * n + t  # 展開後的索引
+
+        if is_manual:
+            # 手動調整為固定變數
+            value = expected_productions[i, t]
+            fixed_indices.append(idx)
+            fixed_values.append(value)
+        else:
+            # 自由變數
+            initial_guess[i, t] = expected_productions[i, t]  
+            free_indices.append(idx)
+            free_initial_guess.append(initial_guess[i, t])
+            free_bounds.append((0, capacity))
+
     # 將固定值轉換為字典，以便在目標函數中使用
     fixed_dict = dict(zip(fixed_indices, fixed_values))
 
