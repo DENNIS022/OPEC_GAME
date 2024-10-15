@@ -219,7 +219,7 @@ def main():
 
     # 計算利潤和價格
     _, period_prices = country_total_profit(optimized_Q, objective_countries)
-
+    
     # 計算每個國家的總利潤
     country_profits = {}
     for i, country in enumerate(countries):
@@ -235,8 +235,6 @@ def main():
         profit = country_profits[country]
         total_production = np.sum(optimized_Q[i, :])
         leftover = total_reserve - total_production
-        leftover_profit = (backstop_price - mc) * leftover
-        actual_profit = profit + leftover_profit
         production_details = ', '.join(
             [f"Period {t+1}: {optimized_Q[i, t]:.2f}" for t in range(n)]
         )
@@ -244,22 +242,20 @@ def main():
         st.write(f"總產量(不包含11期以70元出售): {total_production:.2f}")
         st.write(f"剩餘產量(11期以70元出售): {leftover:.2f}")
         st.write(f"各期產量: {production_details}")
-        st.write(f"總利潤(於第十一期): {profit:.2f}+{leftover_profit:.2f}= {actual_profit:.2f}")
+        st.write(f"總利潤(於第十一期): {profit:.2f}")
 
     # 計算 OPEC 總產量和總利潤
     total_opec_reserve = country_data.loc[1, 'OPEC']
     total_opec_production = np.sum(optimized_Q)
     opec_leftover = total_opec_reserve - total_opec_production
-    opec_leftover_profit = (backstop_price - mc) * opec_leftover
     total_profit = sum(country_profits.values())
-    opec_actual_profit = total_profit + opec_leftover_profit
     opec_production_details = ', '.join(
         [f"Period {t+1}: {np.sum(optimized_Q[:, t]):.2f}" for t in range(n)]
     )
     st.subheader("OPEC 結果")
     st.write(f"OPEC 總產量: {total_opec_production:.2f}")
     st.write(f"OPEC 剩餘產量(11期以70元出售): {opec_leftover:.2f}")
-    st.write(f"OPEC 總利潤: {total_profit:.2f}+{opec_leftover_profit:.2f}={opec_actual_profit:.2f}")
+    st.write(f"OPEC 總利潤: {total_profit:.2f}")
     st.write(f"各期總產量: {opec_production_details}")
 
     # 顯示價格資訊
@@ -285,15 +281,19 @@ def country_total_profit(Q, objective_countries):
 
         price = slope * total_Q_t + intercept  # 每期的價格
         period_prices.append(price)  # 將價格加入列表
-
+        
         # 計算目標國家的利潤總和
         for country in objective_countries:
             i = countries.index(country)
             country_mc = marginal_costs[country]
+            capacity = country_data.loc[2, country]
             country_profit = (price - country_mc) * Q[i, t]
             country_future_value = country_profit * (1 + interest_rate) ** (n - t)
+            backstop_value = (backstop_price - country_mc) * (capacity - Q_t[i])
+            country_future_value = country_future_value + backstop_value
             country_profit_value += country_future_value
-            
+            # 計算目標國家的利潤
+           
     return -country_profit_value, period_prices  # 返回負的目標國家利潤總和和價格列表
 
 # 計算單個國家的總利潤（不改變價格計算）
@@ -303,9 +303,13 @@ def compute_country_profit(country, Q, period_prices):
         price = period_prices[t]
         i = countries.index(country)  # 獲取該國家的索引
         mc = marginal_costs[country]  # 該國家的邊際成本
+        capacity = country_data.loc[2, country]
         profit = (price - mc) * Q[i, t]  # 該國家每期的利潤
-        future_value = profit * (1 + interest_rate) ** (n - t)  
+        future_value = profit * (1 + interest_rate) ** (n - t)
+        backstop_value = (backstop_price - mc) * (capacity - Q[i, t]) #第11期賣掉的  
+        future_value = future_value + backstop_value
         total_profit_value += future_value
+        
     return total_profit_value
 
 if __name__ == "__main__":
